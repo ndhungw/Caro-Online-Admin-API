@@ -11,6 +11,7 @@ class Database {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
+      useFindAndModify: false,
     });
     const db = mongoose.connection;
     db.on("error", console.error.bind(console, "Connection error:"));
