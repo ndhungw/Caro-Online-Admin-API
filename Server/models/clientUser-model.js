@@ -1,9 +1,28 @@
+/**
+ * pre-save hook
+ * used to hash the user's password using the bcrypt package
+ * whenever a user is created or their password is changed before saving in the database.
+ *
+ * comparePassword method
+ * used to compare the password entered by the user during login to the user's password currently in the database.
+ *
+ * generateJWT method
+ * used for creating the authentication tokens using the jwt package.
+ * This token will be returned to the user and will be required for accessing protected routes.
+ *
+ * The token payload includes the user's first name, last name, username and email address and is set to expire 60 days in the future.
+ *
+ * generatePasswordReset method
+ * used to generate a password reset token using the Node.js crypto module and and calculates an expiry time (1 hour),
+ * the user object is updated with this data.
+ */
+
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-const userSchema = new mongoose.Schema(
+const clientUserSchema = new mongoose.Schema(
   {
     email: {
       type: String,
@@ -21,9 +40,20 @@ const userSchema = new mongoose.Schema(
       unique: true,
       required: "Your password is required",
     },
-    active: {
-      type: Boolean,
-      default: false,
+    firstName: {
+      type: String,
+      required: "First Name is required",
+      max: 100,
+    },
+    lastName: {
+      type: String,
+      required: "Last Name is required",
+      max: 100,
+    },
+    profileImage: {
+      type: String,
+      required: false,
+      max: 255,
     },
     resetPasswordToken: {
       type: String,
@@ -33,6 +63,10 @@ const userSchema = new mongoose.Schema(
       type: Date,
       required: false,
     },
+    active: {
+      type: Boolean,
+      default: false,
+    },
     activationToken: {
       type: String,
       required: false,
@@ -41,7 +75,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.pre("save", function (next) {
+clientUserSchema.pre("save", function (next) {
   const user = this;
 
   if (!user.isModified("password")) return next();
@@ -55,11 +89,11 @@ userSchema.pre("save", function (next) {
   });
 });
 
-userSchema.methods.comparePassword = function (password) {
+clientUserSchema.methods.comparePassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 
-userSchema.methods.generateJWT = function () {
+clientUserSchema.methods.generateJWT = function () {
   const today = new Date();
   const expirationDate = new Date(today);
   expirationDate.setDate(today.getDate() + 60);
@@ -81,15 +115,15 @@ userSchema.methods.generateJWT = function () {
 
 // do not use the arrow function notation, it will change what 'this' is referring to,
 // so it not pointing the user document anymore.
-userSchema.methods.generatePasswordReset = function () {
+clientUserSchema.methods.generatePasswordReset = function () {
   this.resetPasswordToken = crypto.randomBytes(20).toString("hex");
   this.resetPasswordExpires = Date.now() + 1000 * 60 * 60; // expires in an hour
 };
 
-userSchema.methods.generateActivationToken = function () {
+clientUserSchema.methods.generateActivationToken = function () {
   this.activationToken = crypto.randomBytes(20).toString("hex");
 };
 
-const User = mongoose.model("AdminUsers", userSchema, "adminUsers");
+const ClientUser = mongoose.model("ClientUsers", clientUserSchema, "users");
 
-module.exports = User;
+module.exports = ClientUser;

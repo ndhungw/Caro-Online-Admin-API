@@ -11,6 +11,7 @@ require("./configs/database");
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
+const clientUsersRouter = require("./routes/client-users");
 const authRouter = require("./routes/auth");
 
 const app = express();
@@ -32,6 +33,7 @@ const authenticate = require("./middlewares/authenticate");
 
 app.use("/", indexRouter);
 app.use("/api/users", authenticate, usersRouter);
+app.use("/api/client-users/", authenticate, clientUsersRouter);
 app.use("/api/auth", authRouter);
 // app.use("/test", testRouter);
 
