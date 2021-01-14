@@ -27,12 +27,12 @@ passwordController.recover = async (req, res) => {
 
     try {
       const userAfterSave = await user.save();
-      const link =
-        "http://" +
-        // req.headers.host +
-        process.env.FRONTEND_DOMAIN +
-        "/reset-password/" /* change this part to a link of front end which will render a view for typing reset password */ +
-        userAfterSave.resetPasswordToken;
+      const link = `${process.env.FRONTEND_DOMAIN}/reset-password/${userAfterSave.resetPasswordToken}`;
+      // "http://" +
+      // // req.headers.host +
+      // process.env.FRONTEND_DOMAIN +
+      // "/reset-password/" /* change this part to a link of front end which will render a view for typing reset password */ +
+      // userAfterSave.resetPasswordToken;
       const mailOptions = {
         to: user.email,
         from: process.env.FROM_EMAIL,

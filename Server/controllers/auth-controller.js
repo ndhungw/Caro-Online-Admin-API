@@ -31,13 +31,13 @@ authController.register = async (req, res) => {
       const newUser = await newUserToSave.save();
 
       // Attempt to send activation email
-      const link =
-        "http://" +
-        process.env.FRONTEND_DOMAIN +
-        "/activate/" +
-        // req.headers.host +
-        // "/api/auth/activate/" /* change this part to 'a link of front end' which will render an ACTIVATION VIEW */ +
-        newUser.activationToken;
+      const link = `${process.env.FRONTEND_DOMAIN}/activate/${newUser.activationToken}`;
+      // "http://" +
+      // process.env.FRONTEND_DOMAIN +
+      // "/activate/" +
+      // // req.headers.host +
+      // // "/api/auth/activate/" /* change this part to 'a link of front end' which will render an ACTIVATION VIEW */ +
+      // newUser.activationToken;
       console.log("link req.headers.host", link);
       const mailOptions = {
         to: newUser.email,
